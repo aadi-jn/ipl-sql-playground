@@ -1,0 +1,8 @@
+# Light by default. Users can switch to dark anytime via the top-right menu
+# (⋮ → Settings → Theme), which re-themes everything including the results table.
+[theme]
+base = "light"
+primaryColor = "#1f6feb"
+
+[browser]
+gatherUsageStats = false
