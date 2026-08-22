@@ -37,6 +37,7 @@ TABLES = [
     "ipl_players",
     "ipl_batter_match_stats",
     "ipl_bowler_match_stats",
+    "match_info_v2",
 ]
 # Columns stored as INT64 epoch NANOSECONDS in BigQuery; shown as dates, not numbers.
 DATE_NANOS_COLS = {"match_date"}
