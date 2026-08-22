@@ -11,7 +11,7 @@ paste and run them here — no GCP/BigQuery account needed.
 - **Errors are copyable** — BigQuery's own error message is shown in a code block with a
   one-click copy icon, so attendees can paste it back to their AI agent.
 - **CSV download** of any result set.
-- **Table preview** — 4 tabs, 50 rows each, with a **"Copy schema"** button per table that
+- **Table preview** — 5 tabs, 50 rows each, with a **"Copy schema"** button per table that
   hands over an annotated `CREATE TABLE` (with data-trap notes) to paste into an agent.
 - **Light by default**, with a working dark toggle via the top-right **⋮ → Settings → Theme**
   (Streamlit re-themes everything, including the results grid — set in `.streamlit/config.toml`).
@@ -23,18 +23,26 @@ paste and run them here — no GCP/BigQuery account needed.
   tier). `maximum_bytes_billed` (~100 MB) makes any runaway query *error*, not cost.
 - Access is gated by a single **shared password**.
 
-## The 4 tables & known data quirks
-`ipl_match_info`, `ipl_players`, `ipl_batter_match_stats`, `ipl_bowler_match_stats`.
+## The 5 tables & known data quirks
+`ipl_match_info`, `ipl_players`, `ipl_batter_match_stats`, `ipl_bowler_match_stats`,
+`match_info_v2`.
+
+`match_info_v2` is a cleaned copy of `ipl_match_info` — canonical venue/city/team names, a
+proper `season_start_year`, a BOOL `neutral_venue`, and derived `home_team`/`away_team`
+columns, so the spelling-merge / normalization traps that live in the raw table are already
+handled. It also drops `ipl_match_info`'s umpire/referee and Impact Player columns (no
+analytical value for this dataset) — see `match_info_v2_column_reference.md` for the full
+column-by-column detail and `schemas/match_info_v2.sql` for the build script.
 
 The app normalizes a few BigQuery storage quirks **at display time only** (the tables are
 never modified). Full details live in `schemas/*.sql`:
 - **`match_date`** (batter & bowler tables) is stored as `INT64` epoch **nanoseconds**
   (e.g. `1208476800000000000` = `2008-04-18`). Shown as a readable date in the app.
   In SQL: `DATE(TIMESTAMP_MICROS(CAST(match_date/1000 AS INT64)))`.
-- **`date`** (match_info) is a `STRING` `'YYYY-MM-DD'`, not a DATE type. Shown as literal
-  text (Streamlit would otherwise auto-render ISO strings as epoch numbers).
-- **BOOLEAN** columns (`dismissed`, `not_out`, `is_duck`, `is_player_of_match`) are shown as
-  `true`/`false` text instead of Streamlit's default checkboxes.
+- **`date`** (match_info, match_info_v2) is a `STRING` `'YYYY-MM-DD'`, not a DATE type.
+  Shown as literal text (Streamlit would otherwise auto-render ISO strings as epoch numbers).
+- **BOOLEAN** columns (`dismissed`, `not_out`, `is_duck`, `is_player_of_match`,
+  `neutral_venue`) are shown as `true`/`false` text instead of Streamlit's default checkboxes.
 
 ## Files
 ```
@@ -45,7 +53,8 @@ never modified). Full details live in `schemas/*.sql`:
 │   ├── ipl_match_info.sql
 │   ├── ipl_players.sql
 │   ├── ipl_batter_match_stats.sql
-│   └── ipl_bowler_match_stats.sql
+│   ├── ipl_bowler_match_stats.sql
+│   └── match_info_v2.sql
 ├── .streamlit/
 │   ├── config.toml            # Light theme default (committed)
 │   ├── secrets.toml.example    # template (committed)

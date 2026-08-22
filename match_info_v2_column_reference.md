@@ -2,14 +2,19 @@
 
 Companion to [schemas/match_info_v2.sql](schemas/match_info_v2.sql). This is the cleaned v2 of
 [`ipl_match_info`](match_info_column_reference.md) — same grain (one row per match, PK
-`match_id`), same 31 original columns, plus 3 new ones (`season_start_year`, `home_team`,
-`away_team`). The original `ipl_match_info` table is left unmodified; this is a separate table
-built from it. This is the AI-friendly version — paste it into an agent's context before it
-writes queries against this table.
+`match_id`), 22 of the original 31 columns (umpire/referee and Impact Player columns dropped —
+see below), plus 3 new ones (`season_start_year`, `home_team`, `away_team`), for 25 total. The
+original `ipl_match_info` table is left unmodified; this is a separate table built from it. This
+is the AI-friendly version — paste it into an agent's context before it writes queries against
+this table.
 
 **Table:** `ipl-nao.ipl_db.match_info_v2` · **Grain:** one row per match · **Primary key:**
 `match_id` (also join key to `ipl_batter_match_stats` / `ipl_bowler_match_stats`) · **Rows
 checked:** 1,243 rows (identical row count to `ipl_match_info`), 2008-04-18 to 2026-05-31.
+
+**Dropped from `ipl_match_info` (2026-08-22):** `umpire1`, `umpire2`, `match_referee`,
+`tv_umpire`, `reserve_umpire`, `team1_impact_in`/`team1_impact_out`,
+`team2_impact_in`/`team2_impact_out` — no analytical value for this dataset's purpose.
 
 **If you were using `ipl_match_info`, read this first:** venue and city are now canonical (no
 normalization needed before `GROUP BY`), team names are canonicalized (no rename pairs left to
@@ -234,12 +239,6 @@ home-advantage yourself.
   team.
 - **Clarification:** —
 
-### umpire1 / umpire2
-- **Description:** The two on-field umpires. Unchanged.
-- **Type:** STRING
-- **Gotchas:** unordered pair, never equal within a row.
-- **Clarification:** —
-
 ### event_stage
 - **Description:** Named knockout/playoff stage. Unchanged.
 - **Type:** STRING
@@ -262,32 +261,6 @@ home-advantage yourself.
 - **Type:** FLOAT64
 - **Gotchas:** NULL for 6 of the 9 `no result` matches (the other 3 had a chase already
   underway).
-- **Clarification:** —
-
-### match_referee
-- **Description:** Match referee (off-field official). Unchanged.
-- **Type:** STRING
-- **Categories:** 32 distinct names
-- **Gotchas:** no nulls.
-- **Clarification:** —
-
-### tv_umpire
-- **Description:** Third/TV umpire. Unchanged.
-- **Type:** STRING
-- **Gotchas:** 4 nulls.
-- **Clarification:** —
-
-### reserve_umpire
-- **Description:** Reserve/fourth umpire. Unchanged.
-- **Type:** STRING
-- **Gotchas:** 24 nulls.
-- **Clarification:** —
-
-### team1_impact_in / team1_impact_out / team2_impact_in / team2_impact_out
-- **Description:** Substitute brought on (`_in`) and player replaced (`_out`) under IPL's
-  Impact Player rule. Unchanged.
-- **Type:** STRING
-- **Gotchas:** NULL for every match before the 2023 season (rule didn't exist yet).
 - **Clarification:** —
 
 ### match_id

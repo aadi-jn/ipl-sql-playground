@@ -2,7 +2,7 @@
 
 A single-page Streamlit app that lets workshop attendees run read-only SQL against
 the IPL warehouse (project `ipl-nao`, dataset `ipl_db`), see results or BigQuery's
-own error message, and download results as CSV. Four tables can be previewed, each
+own error message, and download results as CSV. Five tables can be previewed, each
 with a copyable schema to paste into their AI agent.
 
 Read-only is enforced by the service account's IAM roles (dataViewer + jobUser), not

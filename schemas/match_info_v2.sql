@@ -41,6 +41,11 @@
 --                  `city`. NULL/NULL when neutral_venue is TRUE, when neither team's home city
 --                  matches the match city, or (degenerate case) when both would match. Punjab
 --                  Kings counts as home for BOTH Mohali and Mullanpur.
+--   8. DROPPED (2026-08-22): umpire1, umpire2, match_referee, tv_umpire, reserve_umpire,
+--                  team1_impact_in/out, team2_impact_in/out -- no analytical value for this
+--                  dataset's purpose. Applied directly against the live table via
+--                  ALTER TABLE ... DROP COLUMN; this script is updated to match so a future
+--                  CREATE OR REPLACE run doesn't resurrect them.
 --
 -- Notes carried over from the source table:
 --   `date` is a STRING in ISO format 'YYYY-MM-DD' (e.g. '2008-04-18'), not a DATE type.
@@ -179,18 +184,9 @@ base AS (
     t.method,
     t.eliminator_clean AS eliminator,
     t.player_of_match,
-    t.umpire1,
-    t.umpire2,
     t.event_stage,
     CASE WHEN t.filename = '392186.yaml' THEN 9.333 ELSE t.target_overs END AS target_overs,
     t.target_runs,
-    t.match_referee,
-    t.tv_umpire,
-    t.reserve_umpire,
-    t.team1_impact_in,
-    t.team1_impact_out,
-    t.team2_impact_in,
-    t.team2_impact_out,
     t.match_id
   FROM team_clean t
   JOIN venue_map vm ON t.venue = vm.raw_venue
@@ -272,17 +268,8 @@ SELECT
   method,
   eliminator,
   player_of_match,
-  umpire1,
-  umpire2,
   event_stage,
   target_overs,
   target_runs,
-  match_referee,
-  tv_umpire,
-  reserve_umpire,
-  team1_impact_in,
-  team1_impact_out,
-  team2_impact_in,
-  team2_impact_out,
   match_id
 FROM home_calc;
